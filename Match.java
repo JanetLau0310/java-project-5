@@ -2,7 +2,7 @@ import java.util.Arrays;
 
 public class Match {
     public static void main(String[] args) {
-     if (args.length != 2) {
+    if (args.length != 2) {
         System.out.println("Usage: java Match [regex] [string]");
         System.out.println("       Put regex in quotes to avoid shell parsing weirdness");
         return;
@@ -13,7 +13,7 @@ public class Match {
 
       if (nfa.match(args[1], 4)) {
           System.out.println("yes");
-        } else { System.out.println("no"); } /**/
+        } else { System.out.println("no"); }  /**/
       //testPerformance();
       //test2();
       //testfunction();
@@ -61,7 +61,6 @@ public class Match {
     }
     static void testfunction(){
         NFA nfa = new NFA();
-        NFA nfa1 = new NFA();
 
         Object a = nfa.newState();
         Object b = nfa.newState();

@@ -58,7 +58,7 @@ public class NFA {
        //System.out.println(Arrays.toString(transition(0).toArray()));
     }
     // build a new Node in NFA
-    Node newState() {
+    Object newState() {
         Node newState = new Node();
         if(nfa!=null){
             nfa.add(newState);
@@ -102,8 +102,12 @@ public class NFA {
         }
     }
     // return all the nodes in NFA
-    List<Node> states() {
-        return nfa;
+    List<Object> states() {
+        List<Object> res = new ArrayList<>();
+        for(Node n:nfa){
+            res.add(n);
+        }
+        return res;
     }
 
     Object start_state() {
@@ -118,8 +122,8 @@ public class NFA {
         throw new UnsupportedOperationException();
     }
 
-    List<Node> final_states() {//return the final state
-        ArrayList<Node> final_state = new ArrayList<>();
+    List<Object> final_states() {//return the final state
+        List<Object> final_state = new ArrayList<>();
         for(Node n:nfa){
             if(n.isEnd){
                 final_state.add(n);
@@ -130,6 +134,7 @@ public class NFA {
         }
         throw new UnsupportedOperationException();
     }
+
     public Node getID(int state){
         if(nfa != null){
             for(Node n:nfa){
@@ -154,50 +159,6 @@ public class NFA {
            pairs_tran.add(new AbstractMap.SimpleEntry<Character,Integer>(key,value));
        }
        return pairs_tran;
-    }
-
-    public boolean match(String test,int nthreads){
-        // test regex matching
-        // s is the testing string
-        ArrayList<Integer> eclosure = new ArrayList<Integer>();
-        //ArrayList<Node> end_state = final_states();
-
-        DirectedDFS dfs = new DirectedDFS(G, 0);
-        for(int v = 0;v<G.getV();v++){
-            if(dfs.marked(v)) eclosure.add(v);
-        }
-        //initial, then start to use multi threads
-        // go through all the char in String test
-        for(int i=0;i<test.length();i++){
-            ArrayList<Integer> match = new ArrayList<Integer>();
-            //read in a char, then transfer the state in pc
-            for(int stateNum:eclosure) {
-                if (stateNum < M) {
-                    if (re[stateNum] == test.charAt(i)) {
-                        //for every state in match, compare with char i in test
-                        //if matches
-                        match.add(stateNum + 1);
-                    }
-                }
-            }
-
-            eclosure = new ArrayList<Integer>();
-            // count the epsilon-closure in match
-            dfs = new DirectedDFS(G, match);
-            for(int v=0;v<G.getV();v++) {
-                if (dfs.marked(v)) {
-                    eclosure.add(v);
-                }
-            }
-        }
-
-        for(int v:eclosure) {
-            // check if get the end
-            if(v == M){
-                return true;
-            }
-        }
-        return false;
     }
 
     private Graph buildEpsilonTrnsitionDigraph() {
@@ -325,11 +286,11 @@ public class NFA {
         tmp = (Node)t.start_state();
         tmp.isStart = false;
 
-        for(Node n:t.final_states()){
-            newBeg.newTransition(n,'#',newBeg.start_state());
-            n.isEnd = false;
+        for(Object obj:t.final_states()){
+            newBeg.newTransition(obj,'#',newBeg.start_state());
+            tmp = (Node)obj;
+            tmp.isEnd = false;
         }
-
         return newBeg;
     }
     // r = ab
@@ -344,6 +305,50 @@ public class NFA {
         Node tmp = (Node)b.start_state();
         tmp.isStart = false;
         return a;
+    }
+
+    public boolean match(String test,int nthreads){
+        // test regex matching
+        // s is the testing string
+        ArrayList<Integer> eclosure = new ArrayList<Integer>();
+        //ArrayList<Node> end_state = final_states();
+
+        DirectedDFS dfs = new DirectedDFS(G, 0);
+        for(int v = 0;v<G.getV();v++){
+            if(dfs.marked(v)) eclosure.add(v);
+        }
+        //initial, then start to use multi threads
+        // go through all the char in String test
+        for(int i=0;i<test.length();i++){
+            ArrayList<Integer> match = new ArrayList<Integer>();
+            //read in a char, then transfer the state in pc
+            for(int stateNum:eclosure) {
+                if (stateNum < M) {
+                    if (re[stateNum] == test.charAt(i)) {
+                        //for every state in match, compare with char i in test
+                        //if matches
+                        match.add(stateNum + 1);
+                    }
+                }
+            }
+
+            eclosure = new ArrayList<Integer>();
+            // count the epsilon-closure in match
+            dfs = new DirectedDFS(G, match);
+            for(int v=0;v<G.getV();v++) {
+                if (dfs.marked(v)) {
+                    eclosure.add(v);
+                }
+            }
+        }
+
+        for(int v:eclosure) {
+            // check if get the end
+            if(v == M){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
