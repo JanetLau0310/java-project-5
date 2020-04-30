@@ -16,6 +16,7 @@ public class Match {
         } else { System.out.println("no"); } /**/
       //testPerformance();
       //test2();
+      //testfunction();
     }
     static void testPerformance(){
         Regex r = new RStar(new ROr(new RChar('a'), new RChar('b')));
@@ -34,15 +35,12 @@ public class Match {
         System.out.println("The running time of parallel program is :" + (end3 - end2) + " ns");
     }
     static void test2(){
-       Parser p = new Parser("(a|b)*abb");
-        Regex r = p.parse();
-        NFA nfa = new NFA(r);
-        nfa.makeFinal(nfa.newState());
-        System.out.println(nfa.transition(nfa.start_state()));
-        System.out.println(nfa.final_states().get(0));
-        System.out.println(nfa.match("ab",4));
+        Parser p = new Parser("(a|b)*abb");
+        Regex r1 = p.parse();
+        NFA nfa1 = new NFA(r1);
+        System.out.println(nfa1.match("abbbbbbbbbbbabbc",4));
 
-       Parser p2 = new Parser("(a*b|ac)d");
+/*        Parser p2 = new Parser("(a*b|ac)d");
         Regex r2 = p2.parse();
         NFA nfa2 = new NFA(r2);
         assert nfa2.states().get(0).isEnd;
@@ -55,10 +53,27 @@ public class Match {
         NFA nfa3 = new NFA(r3);
         assert nfa3.match("aaaac",4);
 
-/*         Parser p4 = new Parser("d|z");
+        Parser p4 = new Parser("d|z");
         Regex r4 = p4.parse();
         NFA nfa4 = new NFA(r4);
         nfa4.match("dz",4);
         System.out.println(nfa4.transition(0));*/
+    }
+    static void testfunction(){
+        NFA nfa = new NFA();
+        NFA nfa1 = new NFA();
+
+        Object a = nfa.newState();
+        Object b = nfa.newState();
+        System.out.println(a.equals(b));
+
+        nfa.newTransition(nfa.start_state(),'a',a);
+        nfa.newTransition(nfa.start_state(),'b',b);
+        nfa.makeFinal(a);
+        nfa.makeFinal(b);
+
+        System.out.println(nfa.final_states().size());
+        System.out.println(nfa.transition(nfa.start_state()));
+        System.out.println(nfa.states());
     }
 }
