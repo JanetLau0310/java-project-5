@@ -106,10 +106,15 @@ public class NFA {
     public Node start_state() {
         //return the start state
         if(nfa != null){
+            int i = 0;
             for(Node n:nfa){
                 if(n.isStart){
+                    i = 1;
                     return n;
                 }
+            }
+            if(i==0){
+                throw new UnsupportedOperationException();
             }
         }
         throw new UnsupportedOperationException();
@@ -143,15 +148,9 @@ public class NFA {
     public List<Map.Entry<Character, Integer>> transition(int state) {
        Node n = this.getID(state);
        Map<Character,Integer> map = new HashMap<>();
-       List<Map.Entry<Character, Integer>> pairs_tran = new LinkedList<>();
+       List<Map.Entry<Character, Integer>> pairs_tran = new ArrayList<Map.Entry<Character, Integer>>();
        for(int i=0; i<n.desNode.size();i++){
-           map.put(n.label.get(i),n.desNode.get(i).getState());
-           Set entrySet = map.entrySet();
-           Iterator it = entrySet.iterator();
-           while(it.hasNext()){
-               Map.Entry entry = (Map.Entry) it.next();
-               pairs_tran.add(entry);
-           }
+           pairs_tran.add(new AbstractMap.SimpleEntry<Character,Integer>(n.label.get(i),n.desNode.get(i).getState()));
        }
 
 

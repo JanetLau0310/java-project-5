@@ -13,8 +13,8 @@ public class Match {
 
       if (nfa.match(args[1], 4)) {
           System.out.println("yes");
-        } else { System.out.println("no"); }/**/
-      test2();
+        } else { System.out.println("no"); }
+      /*test2();*/
     }
     static void testPerformance(){
         Regex r = new RStar(new ROr(new RChar('a'), new RChar('b')));
@@ -36,14 +36,13 @@ public class Match {
         Parser p = new Parser("(a|b)*abb");
         Regex r = p.parse();
         NFA nfa = new NFA(r);
-        System.out.println(Arrays.toString(nfa.transition(nfa.start_state().getState()).toArray()));
+        System.out.println(nfa.transition(nfa.start_state().getState()));
         System.out.println(nfa.match("ab",4));
         Parser p2 = new Parser("(a*b|ac)d");
         Regex r2 = p2.parse();
         NFA nfa2 = new NFA(r2);
-        //assert nfa2.states().get(0).isEnd;
+        assert nfa2.states().get(0).isEnd;
         assert nfa2.final_states().get(0).isEnd;
-        //System.out.println(Arrays.toString(nfa2.states().toArray()));
         System.out.println(nfa2.transition(nfa2.start_state().getState()));
         System.out.println(nfa2.match("aaaabd",4));
 
