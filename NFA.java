@@ -308,40 +308,59 @@ public class NFA {
     }
 
     public boolean match(String test,int nthreads){
-        // test regex matching
-        // s is the testing string
         ArrayList<Integer> eclosure = new ArrayList<Integer>();
-        //ArrayList<Node> end_state = final_states();
-
-        DirectedDFS dfs = new DirectedDFS(G, 0);
-        for(int v = 0;v<G.getV();v++){
-            if(dfs.marked(v)) eclosure.add(v);
+        // initial, then start to use multi threads
+        Graph graph_dfs = new Graph(G, 0);
+        for(int v = 0;v<G.getSize();v++){
+            if(graph_dfs.visited(v)) eclosure.add(v);
         }
-        //initial, then start to use multi threads
-        // go through all the char in String test
+
+        /*------  multi-threads version ---------*/
+/*        Thread[] lookers = new Looker[nthreads];
+        boolean[] visited = new boolean[nthreads];
+
+        for(int i = 0; i<nthreads; i++){
+            visited[i] = false;
+            lookers[i] = new Looker(G,i);
+            lookers[i].start();
+        }
+        for(int i = 0; i<nthreads; i++){
+            try {
+                lookers[i].join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        for(int i = 0;i<nthreads;i++){
+            if(!visited[i]){
+                return false;
+            }
+        }
+        return true;*/
+
+        /*------ this is the non-thread version ------*/
+        // compute every NFA state that test[i+1] can reach
         for(int i=0;i<test.length();i++){
-            ArrayList<Integer> match = new ArrayList<Integer>();
             //read in a char, then transfer the state in pc
+            ArrayList<Integer> match = new ArrayList<Integer>();
             for(int stateNum:eclosure) {
                 if (stateNum < M) {
+                    //for every state in match, compare with char i in test
                     if (re[stateNum] == test.charAt(i)) {
-                        //for every state in match, compare with char i in test
-                        //if matches
                         match.add(stateNum + 1);
                     }
                 }
             }
-
             eclosure = new ArrayList<Integer>();
             // count the epsilon-closure in match
-            dfs = new DirectedDFS(G, match);
-            for(int v=0;v<G.getV();v++) {
-                if (dfs.marked(v)) {
+            graph_dfs = new Graph(G, match);
+            for(int v=0;v<G.getSize();v++) {
+                if (graph_dfs.visited(v)) {
+                    // eclosure will be update in every for loop
                     eclosure.add(v);
                 }
             }
         }
-
         for(int v:eclosure) {
             // check if get the end
             if(v == M){
@@ -349,6 +368,6 @@ public class NFA {
             }
         }
         return false;
+        /**/
     }
-
 }
