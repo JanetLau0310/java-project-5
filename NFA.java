@@ -1,3 +1,4 @@
+import java.rmi.UnexpectedException;
 import java.util.*;
 
 public class NFA {
@@ -80,13 +81,19 @@ public class NFA {
     // set state s.end = true
     void makeFinal(int s) {
         if(nfa != null){
+            int i = 0;
             for(Node n:nfa){
                 if(n.getState() == s){
+                    i++;
                     n.isEnd = true;
                 }
             }
+            if(i==0){
+                throw new UnsupportedOperationException();
+            }
+        }else{
+            throw new UnsupportedOperationException();
         }
-        throw new UnsupportedOperationException();
     }
     // return all the nodes in NFA
     public ArrayList<Node> states() {
