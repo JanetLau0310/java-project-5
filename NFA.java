@@ -148,15 +148,15 @@ public class NFA {
     // returns a list of pairs of transitions for the given state.
     // An ε-transition should be represented using the character #
     // for ab*, The edges from S0 are ('a', S0), ('b', S0), and ('a', S1).
-    public List<Map.Entry<Character, Integer>> transition(Object state) {
+    public List<Map.Entry<Character, Object>> transition(Object state) {
         Node tmp = (Node) state;
         int s = tmp.getState();
         Node n = this.getID(s);
-        List<Map.Entry<Character, Integer>> pairs_tran = new ArrayList<Map.Entry<Character, Integer>>();
+        List<Map.Entry<Character, Object>> pairs_tran = new ArrayList<Map.Entry<Character, Object>>();
         for(int i=0; i<n.desNode.size();i++){
             Integer value = n.desNode.get(i).getState();
             Character key = n.label.get(i);
-           pairs_tran.add(new AbstractMap.SimpleEntry<Character,Integer>(key,value));
+            pairs_tran.add(new AbstractMap.SimpleEntry<Character,Object>(key,value));
        }
        return pairs_tran;
     }

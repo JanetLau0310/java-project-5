@@ -1,4 +1,6 @@
 import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class Match {
     public static void main(String[] args) {
@@ -72,7 +74,9 @@ public class Match {
         nfa.makeFinal(b);
 
         System.out.println(nfa.final_states().size());
-        System.out.println(nfa.transition(nfa.start_state()));
-        System.out.println(nfa.states());
+        List<Map.Entry<Character, Object>> pairs_tran = nfa.transition(nfa.start_state());
+        System.out.println(pairs_tran.get(0).getValue().getClass());
+
+        //System.out.println(nfa.states());
     }
 }
