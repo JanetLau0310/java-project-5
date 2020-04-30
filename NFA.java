@@ -59,24 +59,26 @@ public class NFA {
     }
     // build a new Node in NFA
     Node newState() {
+        Node newState = new Node();
         if(nfa!=null){
-            Node newState = new Node();
             nfa.add(newState);
-            return newState;
         }else{
-            throw new UnsupportedOperationException();
+            nfa = new ArrayList<>();
+            nfa.add(newState);
         }
+        return newState;
     }
     // a transition from start to end with label char c
     void newTransition(Node from, char c, Node to) {
-        if(this.nfa == null){
-            throw new UnsupportedOperationException();
+        if(this.nfa != null) {
+            if (this.nfa.contains(from) && this.nfa.contains(to)) {
+                if ((c >= 'a' && c <= 'z') || (c == '#')) {
+                    from.addEdge(c, to);
+                    return;
+                }
+            }
         }
-        if((c >= 'a' && c <= 'z') || (c == '#')){
-            from.addEdge(c,to);
-        }else{
-            throw new UnsupportedOperationException();
-        }
+        throw new UnsupportedOperationException();
     }
     // set state s.end = true
     void makeFinal(int s) {
@@ -97,24 +99,19 @@ public class NFA {
     }
     // return all the nodes in NFA
     public ArrayList<Node> states() {
-      if(nfa == null){
+/*      if(nfa == null){
           throw new UnsupportedOperationException();
-      }
+      }*/
       return nfa;
     }
 
     public Node start_state() {
         //return the start state
         if(nfa != null){
-            int i = 0;
             for(Node n:nfa){
                 if(n.isStart){
-                    i = 1;
                     return n;
                 }
-            }
-            if(i==0){
-                throw new UnsupportedOperationException();
             }
         }
         throw new UnsupportedOperationException();
@@ -152,8 +149,6 @@ public class NFA {
        for(int i=0; i<n.desNode.size();i++){
            pairs_tran.add(new AbstractMap.SimpleEntry<Character,Integer>(n.label.get(i),n.desNode.get(i).getState()));
        }
-
-
        return pairs_tran;
     }
 
@@ -305,29 +300,12 @@ public class NFA {
         Node s2 = b.start_state();
         s2.isStart = false;
 
+        newBeg.nfa.addAll(a.nfa);
+        newBeg.nfa.addAll(b.nfa);
+
         newBeg.newTransition(newBeg.start_state(),'#',s1);
         newBeg.newTransition(newBeg.start_state(),'#',s2);
         newBeg.start_state().isStart = true;
-
-        NFA newEnd = new NFA();
-
-
-        for(Node an:a.final_states()){
-            newEnd.newTransition(an,'#',newEnd.start_state());
-            an.isEnd = false;
-        }
-        for(Node bn: b.final_states()){
-            newEnd.newTransition(bn,'#',newEnd.start_state());
-            bn.isEnd = false;
-        }
-        newEnd.start_state().isEnd = true;
-        newEnd.start_state().isStart = false;
-
-        a.nfa.addAll(newEnd.nfa);
-        b.nfa.addAll(newEnd.nfa);
-
-        newBeg.nfa.addAll(a.nfa);
-        newBeg.nfa.addAll(b.nfa);
 
         return newBeg;
     }
@@ -335,6 +313,7 @@ public class NFA {
     NFA Star(NFA t){
         NFA newBeg = new NFA();
         newBeg.start_state().isEnd = true;
+        newBeg.nfa.addAll(t.nfa);
 
         newBeg.newTransition(newBeg.start_state(),'#',t.start_state());
         t.start_state().isStart = false;
@@ -344,18 +323,18 @@ public class NFA {
             n.isEnd = false;
         }
 
-        newBeg.nfa.addAll(t.nfa);
-
         return newBeg;
     }
     // r = ab
     NFA Concat(NFA a, NFA b){
-        for(Node an:a.final_states()){
-            a.newTransition(an,'#',b.start_state());
-            an.isEnd = false;
+        a.nfa.addAll(b.nfa);
+        for(Node an:a.nfa){
+            if(an.isEnd && !b.nfa.contains(an)){
+                a.newTransition(an,'#',b.start_state());
+                an.isEnd = false;
+            }
         }
         b.start_state().isStart = false;
-        a.nfa.addAll(b.nfa);
         return a;
     }
 
