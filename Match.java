@@ -15,7 +15,7 @@ public class Match {
           System.out.println("yes");
         } else { System.out.println("no"); } /**/
       //testPerformance();
-     // test2();
+      //test2();
     }
     static void testPerformance(){
         Regex r = new RStar(new ROr(new RChar('a'), new RChar('b')));
@@ -37,23 +37,25 @@ public class Match {
        Parser p = new Parser("(a|b)*abb");
         Regex r = p.parse();
         NFA nfa = new NFA(r);
-        System.out.println(nfa.transition(((Node)nfa.start_state()).getState()));
+        nfa.makeFinal(nfa.newState());
+        System.out.println(nfa.transition(nfa.start_state()));
+        System.out.println(nfa.final_states().get(0));
         System.out.println(nfa.match("ab",4));
 
-        Parser p2 = new Parser("(a*b|ac)d");
+       Parser p2 = new Parser("(a*b|ac)d");
         Regex r2 = p2.parse();
         NFA nfa2 = new NFA(r2);
         assert nfa2.states().get(0).isEnd;
         assert nfa2.final_states().get(0).isEnd;
-        System.out.println(nfa2.transition(((Node)nfa2.start_state()).getState()));
+        System.out.println(nfa2.transition(nfa2.start_state()));
         System.out.println(nfa2.match("aaaabd",4));
 
         Parser p3 = new Parser("(a*b|ac)d");
         Regex r3 = p3.parse();
         NFA nfa3 = new NFA(r3);
         assert nfa3.match("aaaac",4);
-/*
-        Parser p4 = new Parser("d|z");
+
+/*         Parser p4 = new Parser("d|z");
         Regex r4 = p4.parse();
         NFA nfa4 = new NFA(r4);
         nfa4.match("dz",4);

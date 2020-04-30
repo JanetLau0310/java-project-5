@@ -58,7 +58,7 @@ public class NFA {
        //System.out.println(Arrays.toString(transition(0).toArray()));
     }
     // build a new Node in NFA
-    Object newState() {
+    Node newState() {
         Node newState = new Node();
         if(nfa!=null){
             nfa.add(newState);
@@ -83,9 +83,10 @@ public class NFA {
         throw new UnsupportedOperationException();
     }
     // set state s.end = true
-    void makeFinal(Integer state) {
-        int s = state;
-        if(nfa != null){
+    void makeFinal(Object state) {
+         Node tmp = (Node) state;
+         int s = tmp.getState();
+         if(nfa != null){
             int i = 0;
             for(Node n:nfa){
                 if(n.getState() == s){
@@ -142,8 +143,9 @@ public class NFA {
     // returns a list of pairs of transitions for the given state.
     // An ε-transition should be represented using the character #
     // for ab*, The edges from S0 are ('a', S0), ('b', S0), and ('a', S1).
-    public List<Map.Entry<Character, Integer>> transition(Integer state) {
-        int s = state;
+    public List<Map.Entry<Character, Integer>> transition(Object state) {
+        Node tmp = (Node) state;
+        int s = tmp.getState();
         Node n = this.getID(s);
         List<Map.Entry<Character, Integer>> pairs_tran = new ArrayList<Map.Entry<Character, Integer>>();
         for(int i=0; i<n.desNode.size();i++){
