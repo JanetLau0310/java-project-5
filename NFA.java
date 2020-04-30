@@ -19,7 +19,7 @@ public class NFA {
     }
     public NFA BasicNFA(char c){
         NFA tmp = new NFA();
-        Node SimpleChar = tmp.newState();
+        Node SimpleChar = (Node)tmp.newState();
         SimpleChar.isEnd = true;
         tmp.newTransition(tmp.start_state(),c,SimpleChar);
         return tmp;
@@ -58,7 +58,7 @@ public class NFA {
        //System.out.println(Arrays.toString(transition(0).toArray()));
     }
     // build a new Node in NFA
-    Node newState() {
+    Object newState() {
         Node newState = new Node();
         if(nfa!=null){
             nfa.add(newState);
@@ -69,8 +69,10 @@ public class NFA {
         return newState;
     }
     // a transition from start to end with label char c
-    void newTransition(Node from, char c, Node to) {
+    void newTransition(Object start, char c, Object end){
         if(this.nfa != null) {
+            Node from = (Node) start;
+            Node to = (Node) end;
             if (this.nfa.contains(from) && this.nfa.contains(to)) {
                 if ((c >= 'a' && c <= 'z') || (c == '#')) {
                     from.addEdge(c, to);
@@ -81,7 +83,8 @@ public class NFA {
         throw new UnsupportedOperationException();
     }
     // set state s.end = true
-    void makeFinal(int s) {
+    void makeFinal(Integer state) {
+        int s = state;
         if(nfa != null){
             int i = 0;
             for(Node n:nfa){
@@ -98,14 +101,11 @@ public class NFA {
         }
     }
     // return all the nodes in NFA
-    public ArrayList<Node> states() {
-/*      if(nfa == null){
-          throw new UnsupportedOperationException();
-      }*/
-      return nfa;
+    List<Node> states() {
+        return nfa;
     }
 
-    public Node start_state() {
+    Object start_state() {
         //return the start state
         if(nfa != null){
             for(Node n:nfa){
@@ -117,7 +117,7 @@ public class NFA {
         throw new UnsupportedOperationException();
     }
 
-    public ArrayList<Node> final_states() {//return the final state
+    List<Node> final_states() {//return the final state
         ArrayList<Node> final_state = new ArrayList<>();
         for(Node n:nfa){
             if(n.isEnd){
@@ -142,12 +142,14 @@ public class NFA {
     // returns a list of pairs of transitions for the given state.
     // An ε-transition should be represented using the character #
     // for ab*, The edges from S0 are ('a', S0), ('b', S0), and ('a', S1).
-    public List<Map.Entry<Character, Integer>> transition(int state) {
-       Node n = this.getID(state);
-       Map<Character,Integer> map = new HashMap<>();
-       List<Map.Entry<Character, Integer>> pairs_tran = new ArrayList<Map.Entry<Character, Integer>>();
-       for(int i=0; i<n.desNode.size();i++){
-           pairs_tran.add(new AbstractMap.SimpleEntry<Character,Integer>(n.label.get(i),n.desNode.get(i).getState()));
+    public List<Map.Entry<Character, Integer>> transition(Integer state) {
+        int s = state;
+        Node n = this.getID(s);
+        List<Map.Entry<Character, Integer>> pairs_tran = new ArrayList<Map.Entry<Character, Integer>>();
+        for(int i=0; i<n.desNode.size();i++){
+            Integer value = n.desNode.get(i).getState();
+            Character key = n.label.get(i);
+           pairs_tran.add(new AbstractMap.SimpleEntry<Character,Integer>(key,value));
        }
        return pairs_tran;
     }
@@ -295,9 +297,9 @@ public class NFA {
     NFA Union(NFA a, NFA b){
         NFA newBeg = new NFA();
 
-        Node s1 = a.start_state();
+        Node s1 = (Node)a.start_state();
         s1.isStart = false;
-        Node s2 = b.start_state();
+        Node s2 = (Node)b.start_state();
         s2.isStart = false;
 
         newBeg.nfa.addAll(a.nfa);
@@ -305,18 +307,21 @@ public class NFA {
 
         newBeg.newTransition(newBeg.start_state(),'#',s1);
         newBeg.newTransition(newBeg.start_state(),'#',s2);
-        newBeg.start_state().isStart = true;
+        Node tmp = (Node)newBeg.start_state();
+        tmp.isStart = true;
 
         return newBeg;
     }
     // r = t*
     NFA Star(NFA t){
         NFA newBeg = new NFA();
-        newBeg.start_state().isEnd = true;
+        Node tmp = (Node)newBeg.start_state();
+        tmp.isEnd = true;
         newBeg.nfa.addAll(t.nfa);
 
         newBeg.newTransition(newBeg.start_state(),'#',t.start_state());
-        t.start_state().isStart = false;
+        tmp = (Node)t.start_state();
+        tmp.isStart = false;
 
         for(Node n:t.final_states()){
             newBeg.newTransition(n,'#',newBeg.start_state());
@@ -334,7 +339,8 @@ public class NFA {
                 an.isEnd = false;
             }
         }
-        b.start_state().isStart = false;
+        Node tmp = (Node)b.start_state();
+        tmp.isStart = false;
         return a;
     }
 

@@ -16,14 +16,6 @@ public class Node {
         isEnd = false;
     } // make sure that every state is special
 
-/*    public Node(int i){
-        this.state = i;
-        label = new ArrayList<>();
-        desNode = new ArrayList<>();
-        isStart = false;
-        isEnd = false;
-    }*/
-
     public void addEdge(char s, Node d){
         label.add(s);
         desNode.add(d);
