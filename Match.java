@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Match {
     public static void main(String[] args) {
-    if (args.length != 2) {
+   if (args.length != 2) {
         System.out.println("Usage: java Match [regex] [string]");
         System.out.println("       Put regex in quotes to avoid shell parsing weirdness");
         return;
@@ -15,8 +15,9 @@ public class Match {
 
       if (nfa.match(args[1], 4)) {
           System.out.println("yes");
-        } else { System.out.println("no"); }  /**/
+        } else { System.out.println("no"); }   /**/
       //testPerformance();
+      //test1();
       //test2();
       //testfunction();
     }
@@ -36,13 +37,19 @@ public class Match {
         System.out.println("The running time of parallel program is :" + (end2 - end1) + " ns");
         System.out.println("The running time of parallel program is :" + (end3 - end2) + " ns");
     }
+    static void test1(){
+        Regex r = new RStar(new ROr(new RChar('d'), new RChar('z')));
+        NFA nfa = new NFA(r);
+        System.out.println(nfa.transition(nfa.start_state()));
+
+    }
     static void test2(){
-        Parser p = new Parser("(a|b)*abb");
+/*        Parser p = new Parser("(a|b)*abb");
         Regex r1 = p.parse();
         NFA nfa1 = new NFA(r1);
         System.out.println(nfa1.match("abbbbbbbbbbbabbc",4));
 
-/*        Parser p2 = new Parser("(a*b|ac)d");
+        Parser p2 = new Parser("(a*b|ac)d");
         Regex r2 = p2.parse();
         NFA nfa2 = new NFA(r2);
         assert nfa2.states().get(0).isEnd;
@@ -53,13 +60,13 @@ public class Match {
         Parser p3 = new Parser("(a*b|ac)d");
         Regex r3 = p3.parse();
         NFA nfa3 = new NFA(r3);
-        assert nfa3.match("aaaac",4);
+        assert nfa3.match("aaaac",4);*/
 
         Parser p4 = new Parser("d|z");
         Regex r4 = p4.parse();
         NFA nfa4 = new NFA(r4);
         nfa4.match("dz",4);
-        System.out.println(nfa4.transition(0));*/
+        System.out.println(nfa4.transition(nfa4.start_state()).get(0).getValue().getClass());
     }
     static void testfunction(){
         NFA nfa = new NFA();

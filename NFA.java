@@ -154,7 +154,7 @@ public class NFA {
         Node n = this.getID(s);
         List<Map.Entry<Character, Object>> pairs_tran = new ArrayList<Map.Entry<Character, Object>>();
         for(int i=0; i<n.desNode.size();i++){
-            Integer value = n.desNode.get(i).getState();
+            Node value = n.desNode.get(i);
             Character key = n.label.get(i);
             pairs_tran.add(new AbstractMap.SimpleEntry<Character,Object>(key,value));
        }
