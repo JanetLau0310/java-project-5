@@ -1,11 +1,11 @@
 import java.util.ArrayList;
-import java.util.Stack;
 
-class Digraph{
-    private final int V;
-    private int E;
-    private ArrayList<Integer>[] adj;
-    public Digraph(int V){
+public class Graph {
+    private final int V;//number of nodes
+    private int E;//number of edges
+    private ArrayList<Integer>[] adj;//adj matrix
+
+    public Graph(int V){
         this.V = V;
         this.E = 0;
         adj =  (ArrayList<Integer>[]) new ArrayList[V];
@@ -13,7 +13,7 @@ class Digraph{
             adj[v] = new ArrayList<Integer>();
         }
     }
-    public void addEdge(int v,int w){
+    public void addEdge(int v, int w){
         adj[v].add(w);
         E++;
     }
