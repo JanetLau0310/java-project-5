@@ -1,5 +1,9 @@
 import java.rmi.UnexpectedException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class NFA {
     private char[] re;//save the regexp
@@ -9,6 +13,8 @@ public class NFA {
     private Stack<Character> operatorStack;//put the left bracket
     private Stack<NFA> NfaStack;
     private ArrayList<Node> nfa;
+    private ConcurrentHashMap<Integer, AtomicBoolean> visited = new ConcurrentHashMap<>();
+    private ConcurrentHashMap<Integer, List<Integer>> adjacencyList = new ConcurrentHashMap<>();
 
     NFA() {
       //Construct an NFA with one start state and no transitions
@@ -309,58 +315,45 @@ public class NFA {
 
     public boolean match(String test,int nthreads){
         ArrayList<Integer> eclosure = new ArrayList<Integer>();
-        // initial, then start to use multi threads
-        Graph graph_dfs = new Graph(G, 0);
+        visited = new ConcurrentHashMap<>(G.getSize());
+        Graph dfs = new Graph(G, 0);
         for(int v = 0;v<G.getSize();v++){
-            if(graph_dfs.visited(v)) eclosure.add(v);
-        }
-
-        /*------  multi-threads version ---------*/
-/*        Thread[] lookers = new Looker[nthreads];
-        boolean[] visited = new boolean[nthreads];
-
-        for(int i = 0; i<nthreads; i++){
-            visited[i] = false;
-            lookers[i] = new Looker(G,i);
-            lookers[i].start();
-        }
-        for(int i = 0; i<nthreads; i++){
-            try {
-                lookers[i].join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            if(dfs.visited(v)){
+                eclosure.add(v);
             }
+            visited.put(v, new AtomicBoolean((false)));
+            adjacencyList.put(v, (List<Integer>) G.adj(v));
         }
-        for(int i = 0;i<nthreads;i++){
-            if(!visited[i]){
-                return false;
-            }
-        }
-        return true;*/
-
-        /*------ this is the non-thread version ------*/
+        // eclosure contians all the node reachable
         // compute every NFA state that test[i+1] can reach
-        for(int i=0;i<test.length();i++){
-            //read in a char, then transfer the state in pc
+       for(int i=0;i<test.length();i++){
             ArrayList<Integer> match = new ArrayList<Integer>();
+           //for every state in match, compare with char i in test
             for(int stateNum:eclosure) {
                 if (stateNum < M) {
-                    //for every state in match, compare with char i in test
                     if (re[stateNum] == test.charAt(i)) {
                         match.add(stateNum + 1);
                     }
                 }
             }
+           /*------  multi-threads version ---------*/
+           for(int v = 0;v<G.getSize();v++){
+               visited.get(v).set(false);
+           }
+            execute_DFS(nthreads,match);
+
+            //System.out.println(visited.toString());
+            //Graph graph_dfs = new Graph(G,match);
             eclosure = new ArrayList<Integer>();
-            // count the epsilon-closure in match
-            graph_dfs = new Graph(G, match);
             for(int v=0;v<G.getSize();v++) {
-                if (graph_dfs.visited(v)) {
+               //visited.get(v).get()
+                if (visited.get(v).get()) {
                     // eclosure will be update in every for loop
                     eclosure.add(v);
                 }
             }
         }
+       // accept if can end in state M
         for(int v:eclosure) {
             // check if get the end
             if(v == M){
@@ -369,5 +362,42 @@ public class NFA {
         }
         return false;
         /**/
+    }
+
+    private void execute_DFS(int nthreads,Iterable<Integer> sources){
+        ForkJoinPool pool = new ForkJoinPool(nthreads);
+        //System.out.println("Execution started with " + nthreads + " threads");
+        long startTime = System.nanoTime();
+        for(int s:sources){
+            if(!visited.get(s).get()){
+                DFS graph_dfs = new DFS(s);
+                pool.invoke(graph_dfs);
+            }
+        }
+        long endTime = System.nanoTime();
+        long elapsedTime = endTime - startTime;
+        //System.out.println("Execution took " + elapsedTime + " nanoseconds");
+    }
+
+    private class DFS extends RecursiveAction {
+        int node;
+        public DFS(int node){
+            this.node = node;
+        }
+        @Override
+        protected void compute() {
+            String threadName = Thread.currentThread().getName();
+            if(visited.get(node).getAndSet(true)) {
+                return;
+            }
+            //System.out.println("Executing thread " + threadName + ". For node " + node);
+            List<Integer> adjList = adjacencyList.get(node);
+            for(Integer neighbour : adjList) {
+                if(!visited.get(neighbour).get()) {
+                    DFS dfs = new DFS(neighbour);
+                    dfs.fork();
+                }
+            }
+        }
     }
 }

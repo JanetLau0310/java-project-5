@@ -1,28 +1,29 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Graph {
-    private int V;//number of nodes
+    private int size;//number of nodes
     private ArrayList<Integer>[] adj;//adj matrix
     private boolean[] visited;
 
     public Graph(int V){
-        this.V = V;
+        this.size = V;
         adj =  (ArrayList<Integer>[]) new ArrayList[V];
         for(int v=0;v<V;v++) {
             adj[v] = new ArrayList<Integer>();
         }
     }
+
     public void addEdge(int v, int w){
         adj[v].add(w);
     }
     public int getSize(){
-        return V;
+        return size;
     }
     public Iterable<Integer> adj(int v){
         return (Iterable<Integer>)adj[v];
     }
     // check whether visited or not
-
     public Graph(Graph G,int s){
         visited = new boolean[G.getSize()];
         dfs(G,s);

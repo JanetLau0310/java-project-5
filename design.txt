@@ -1,0 +1,9 @@
+In this Design I made a trick on it, for NFA in lexical analysis, one way to find a better match is to convert it into DFA, then go through the Model ( which means using DFS or BFS to check the graph). So if we want to find a matching quicker, the most problem we need to face with is the recursive time cost in DFS / BFS. 
+
+In part one I build my NFA regexp with postfix form, but also build a directed graph with infix, only store the epsilon transition in this regexp, so that will be faster to search all the possibility.
+
+The idea is, that directed graph can build a static adjacent matrix, which can help for threads to check their adjacency list in every DFS call. Also, this matrix with epsilon transition, can build all the possible eclosure  result in order to find the NFA state of every input char. Then we only accept if this state can get the end in the final state.
+
+I use ForkJoinPool when I need to call the DFS function, and also set a DFS class extends RecursiveAction to do this part.
+
+But my result is not stable, which mean for same test string, if I make 16 threads, then I will get a different result than 4 threads.
