@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Match {
     public static void main(String[] args) {
-/*   if (args.length != 2) {
+   if (args.length != 2) {
         System.out.println("Usage: java Match [regex] [string]");
         System.out.println("       Put regex in quotes to avoid shell parsing weirdness");
         return;
@@ -15,10 +15,10 @@ public class Match {
 
       if (nfa.match(args[1], 4)) {
           System.out.println("yes");
-        } else { System.out.println("no"); }   */
+        } else { System.out.println("no"); }   /**/
       //testPerformance();
       //test1();
-      test2();
+      //test2();
       //testfunction();
     }
     static void testPerformance(){

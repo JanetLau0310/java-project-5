@@ -343,11 +343,11 @@ public class NFA {
             execute_DFS(nthreads,match);
 
             //System.out.println(visited.toString());
-            //Graph graph_dfs = new Graph(G,match);
+            Graph graph_dfs = new Graph(G,match);
             eclosure = new ArrayList<Integer>();
             for(int v=0;v<G.getSize();v++) {
                //visited.get(v).get()
-                if (visited.get(v).get()) {
+                if (graph_dfs.visited(v)) {
                     // eclosure will be update in every for loop
                     eclosure.add(v);
                 }
